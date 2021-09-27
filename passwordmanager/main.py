@@ -1,9 +1,10 @@
-import sqlite3, hashlib, os, pyperclip
+import secrets, string, sqlite3, hashlib, os, pyperclip
 from tkinter import *
-from tkinter import simpledialog
 #from PIL import ImageTk, Image
 from urllib.parse import urlparse
 from functools import partial
+
+from requests.api import get, request
 
 #base folder
 base_folder = os.path.dirname(__file__)
@@ -27,13 +28,63 @@ password TEXT NOT NULL);
 """)
 
 #Create PopUp
-def popUp(text):
-    answer = simpledialog.askstring("input string", text)
-    print(answer)
+def popUp():
 
-    return answer
+    popUpWindow = Toplevel(window)
+    popUpWindow.grab_set()
+    popUpWindow.title("Add password")
+    popUpWindow.geometry("400x300")
+    popUpWindow.config(bg="#4A4674")
+    popUpWindow.resizable(False, False)
+    popUpWindow.iconbitmap(icopath)
 
-#Initiate window
+    def rngPassword():
+        secure_str = ''.join((secrets.choice(string.ascii_letters + string.digits) for i in range(12)))
+        txt3.delete(0,END)
+        txt3.insert(0,secure_str)
+
+    def addEntry():
+        website = txt.get()
+        username = txt2.get()
+        password = txt3.get()
+
+        insert_fields = """INSERT INTO vault(website, username, password) 
+        VALUES(?, ?, ?) """
+        cursor.execute(insert_fields, (website, username, password))
+        db.commit()
+
+        popUpWindow.destroy()
+        vaultScreen()
+
+    lbl = Label(popUpWindow, text="Website")
+    lbl.config(anchor=W, fg="white", width=45, bg="#4A4674")
+    lbl.pack(pady=(15,0))
+
+    txt = Entry(popUpWindow, font=30)
+    txt.pack(ipadx=50,ipady=5,pady=(0,10))
+    txt.focus()
+
+    lbl2 = Label(popUpWindow, text="Username")
+    lbl2.config(anchor=W, fg="white", width=45, bg="#4A4674")
+    lbl2.pack()
+    
+    txt2 = Entry(popUpWindow, font=30)
+    txt2.pack(ipadx=50,ipady=5,pady=(0,10))
+
+    lbl3 = Label(popUpWindow, text="Password")
+    lbl3.config(anchor=W, fg="white", width=45, bg="#4A4674")
+    lbl3.pack()
+
+    txt3 = Entry(popUpWindow, font=30)
+    txt3.pack(ipadx=143,ipady=5,pady=(0,10))
+
+    btn3 = Button(txt3, command=rngPassword, text="RNG")
+    btn3.pack(anchor=E, expand=YES)
+
+    btn = Button(popUpWindow, command=addEntry, text="Add password", width=45, height=2, bg="green", fg="white", border=0)
+    btn.pack(ipadx=1, pady=(20,0))
+
+
 window = Tk()
 window.update()
 
@@ -142,22 +193,6 @@ def vaultScreen():
     for widget in window.winfo_children():
         widget.destroy()
 
-    def addEntry():
-        text1 = "Website"
-        text2 = "Username"
-        text3 = "Password"
-        
-        website = urlparse(popUp(text1)).netloc
-        username = popUp(text2)
-        password = popUp(text3)
-
-        insert_fields = """INSERT INTO vault(website, username, password) 
-        VALUES(?, ?, ?) """
-        cursor.execute(insert_fields, (website, username, password))
-        db.commit()
-
-        vaultScreen()
-
     def removeEntry(input):
         cursor.execute("DELETE FROM vault WHERE id = ?", (input,))
         db.commit()
@@ -172,7 +207,7 @@ def vaultScreen():
     headertext = Label(headerframe, text="Password Manager", fg="white", bg="#3C395F", font=60)
     headertext.grid(pady=20, padx=10, row=0, column=0)
 
-    headerbtn = Button(headerframe, text="ADD", fg="white", bg="green", border=0, command=addEntry)
+    headerbtn = Button(headerframe, text="ADD", fg="white", bg="green", border=0, command=popUp)
     headerbtn.grid(pady=20, padx=540, ipadx=5, ipady=5, row=0, column=1)
 
     contentframe = Frame(window)
@@ -207,10 +242,10 @@ def vaultScreen():
             btnframe = Frame(contentframe)
             btnframe.grid(column=3, row=(i+3))
 
-            btn = Button(btnframe, text="C", command = pyperclip.copy(array[i][3]), bg="blue", fg="white", border=0, width=2, pady=2) 
+            btn = Button(btnframe, text="C", command = partial(pyperclip.copy, array[i][3]), bg="blue", fg="white", border=0, width=2, pady=2) 
             btn.grid(column=0, row=0, pady=10, padx=5)
 
-            btn1 = Button(btnframe, text="-", command = partial(removeEntry, array[i][0]), bg="red", fg="white", border=0, width=2, pady=2)
+            btn1 = Button(btnframe, text="D", command = partial(removeEntry, array[i][0]), bg="red", fg="white", border=0, width=2, pady=2)
             btn1.grid(column=1, row=0, pady=10, padx=5)
 
             i = i + 1
