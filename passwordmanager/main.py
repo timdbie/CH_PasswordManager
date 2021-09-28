@@ -325,7 +325,7 @@ def vaultScreen():
             lbl3.grid(column=2, row=(i+3))
 
             btnframe = Frame(contentframe.scrollable_frame)
-            btnframe.grid(column=3, row=(i+3), padx=70)
+            btnframe.grid(column=3, row=(i+3), padx=50)
 
             btn = Button(btnframe, text="C", command = partial(pyperclip.copy, array[i][3]), bg="blue", fg="white", border=0, width=2, pady=2) 
             btn.grid(column=0, row=0, pady=10, padx=5)
