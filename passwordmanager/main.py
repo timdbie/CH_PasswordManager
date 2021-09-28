@@ -1,4 +1,6 @@
 import secrets, string, sqlite3, hashlib, os, pyperclip
+import tkinter as tk
+from tkinter import ttk
 from tkinter import *
 #from PIL import ImageTk, Image
 from urllib.parse import urlparse
@@ -12,6 +14,30 @@ base_folder = os.path.dirname(__file__)
 #database code
 with sqlite3.connect('pw.db') as db:
     cursor = db.cursor()
+
+#scroll
+
+class ScrollableFrame(ttk.Frame):
+    def __init__(self, container, *args, **kwargs):
+        super().__init__(container, *args, **kwargs)
+        canvas = tk.Canvas(self)
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
+        self.scrollable_frame = ttk.Frame(canvas)
+
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(
+                scrollregion=canvas.bbox("all")
+            )
+        )
+
+        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS masterpassword(
@@ -208,19 +234,19 @@ def vaultScreen():
     headertext.grid(pady=20, padx=10, row=0, column=0)
 
     headerbtn = Button(headerframe, text="ADD", fg="white", bg="green", border=0, command=popUp)
-    headerbtn.grid(pady=20, padx=540, ipadx=5, ipady=5, row=0, column=1)
+    headerbtn.grid(pady=20, padx=(0,25), ipadx=5, ipady=5, row=0, column=3, sticky=E)
 
-    contentframe = Frame(window)
+    lbl = Label(headerframe, text="Website", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
+    lbl.grid(row=1, column=0)
+    lbl = Label(headerframe, text="Username", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
+    lbl.grid(row=1, column=1)
+    lbl = Label(headerframe, text="Password", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
+    lbl.grid(row=1, column=2)
+    lbl = Label(headerframe, text="Options", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
+    lbl.grid(row=1, column=3)
+
+    contentframe = ScrollableFrame(window)
     contentframe.pack(fill=BOTH)
-
-    lbl = Label(contentframe, text="Website", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
-    lbl.grid(row=2, column=0)
-    lbl = Label(contentframe, text="Username", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
-    lbl.grid(row=2, column=1)
-    lbl = Label(contentframe, text="Password", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
-    lbl.grid(row=2, column=2)
-    lbl = Label(contentframe, text="Options", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
-    lbl.grid(row=2, column=3)
 
     cursor.execute('SELECT * FROM vault')
     if (cursor.fetchall() != None):
@@ -232,15 +258,15 @@ def vaultScreen():
             if (len(array) == 0):
                 break
 
-            lbl1 = Label(contentframe, text=(array[i][1]), width=28, anchor=W)
+            lbl1 = Label(contentframe.scrollable_frame, text=(array[i][1]), width=28, anchor=W)
             lbl1.grid(column=0, row=(i+3))
-            lbl2 = Label(contentframe, text=(array[i][2]), width=28, anchor=W)
+            lbl2 = Label(contentframe.scrollable_frame, text=(array[i][2]), width=28, anchor=W)
             lbl2.grid(column=1, row=(i+3))
-            lbl3 = Label(contentframe, text=(array[i][3]), width=28, anchor=W)
+            lbl3 = Label(contentframe.scrollable_frame, text=(array[i][3]), width=28, anchor=W)
             lbl3.grid(column=2, row=(i+3))
 
-            btnframe = Frame(contentframe)
-            btnframe.grid(column=3, row=(i+3))
+            btnframe = Frame(contentframe.scrollable_frame)
+            btnframe.grid(column=3, row=(i+3), padx=70)
 
             btn = Button(btnframe, text="C", command = partial(pyperclip.copy, array[i][3]), bg="blue", fg="white", border=0, width=2, pady=2) 
             btn.grid(column=0, row=0, pady=10, padx=5)
