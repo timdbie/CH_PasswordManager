@@ -55,10 +55,9 @@ password TEXT NOT NULL);
 
 #Create PopUp
 def popUp():
-
     popUpWindow = Toplevel(window)
     popUpWindow.grab_set()
-    popUpWindow.title("Add password")
+    popUpWindow.title("Add")
     popUpWindow.geometry("400x300")
     popUpWindow.config(bg="#4A4674")
     popUpWindow.resizable(False, False)
@@ -224,6 +223,66 @@ def vaultScreen():
         db.commit()
         vaultScreen()
 
+    def editPopUp(input):
+        id = input
+        index = input - 1
+
+        popUpWindow = Toplevel(window)
+        popUpWindow.grab_set()
+        popUpWindow.title("Edit")
+        popUpWindow.geometry("400x300")
+        popUpWindow.config(bg="#4A4674")
+        popUpWindow.resizable(False, False)
+        popUpWindow.iconbitmap(icopath)
+
+        def editEntry():
+            if(txt.get() != array[index][1]):
+                cursor.execute('UPDATE vault SET website = ? WHERE id = ?', (txt.get(), id,))
+                
+            if(txt2.get() != array[index][2]):
+                cursor.execute('UPDATE vault SET username = ? WHERE id = ?', (txt2.get(), id,))
+
+            if(txt3.get() != array[index][3]):
+                cursor.execute('UPDATE vault SET password = ? WHERE id = ?', (txt3.get(), id,))
+
+            db.commit()
+            popUpWindow.destroy()
+            vaultScreen()
+
+        lbl = Label(popUpWindow, text="Website")
+        lbl.config(anchor=W, fg="white", width=45, bg="#4A4674")
+        lbl.pack(pady=(15,0))
+
+        txt = Entry(popUpWindow, font=30)
+        txt.pack(ipadx=50,ipady=5,pady=(0,10))
+
+        lbl2 = Label(popUpWindow, text="Website")
+        lbl2.config(anchor=W, fg="white", width=45, bg="#4A4674")
+        lbl2.pack()
+
+        txt2 = Entry(popUpWindow, font=30)
+        txt2.pack(ipadx=50,ipady=5,pady=(0,10))
+
+        lbl3 = Label(popUpWindow, text="Website")
+        lbl3.config(anchor=W, fg="white", width=45, bg="#4A4674")
+        lbl3.pack()
+
+        txt3 = Entry(popUpWindow, font=30)
+        txt3.pack(ipadx=50,ipady=5,pady=(0,10))
+
+        btn = Button(popUpWindow, command=editEntry, text="Edit", width=45, height=2, bg="green", fg="white", border=0)
+        btn.pack(ipadx=1, pady=(20,0))
+
+        cursor.execute('SELECT * FROM vault')
+        if (cursor.fetchall() != None):
+            cursor.execute('SELECT * FROM vault')
+
+            array = cursor.fetchall()
+            
+            txt.insert(0, array[index][1])
+            txt2.insert(0, array[index][2])
+            txt3.insert(0, array[index][3])            
+            
     window.geometry('800x400')
     window.resizable(height=None, width=None)
 
@@ -271,8 +330,11 @@ def vaultScreen():
             btn = Button(btnframe, text="C", command = partial(pyperclip.copy, array[i][3]), bg="blue", fg="white", border=0, width=2, pady=2) 
             btn.grid(column=0, row=0, pady=10, padx=5)
 
-            btn1 = Button(btnframe, text="D", command = partial(removeEntry, array[i][0]), bg="red", fg="white", border=0, width=2, pady=2)
+            btn1 = Button(btnframe, text="E", command = partial(editPopUp, array[i][0]), bg="yellow", fg="white", border=0, width=2, pady=2)
             btn1.grid(column=1, row=0, pady=10, padx=5)
+
+            btn2 = Button(btnframe, text="D", command = partial(removeEntry, array[i][0]), bg="red", fg="white", border=0, width=2, pady=2)
+            btn2.grid(column=2, row=0, pady=10, padx=5)
 
             i = i + 1
 
