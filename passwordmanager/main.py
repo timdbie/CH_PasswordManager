@@ -1,22 +1,22 @@
 import secrets, string, sqlite3, hashlib, os, pyperclip
+from tkinter import font
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 #from PIL import ImageTk, Image
-from urllib.parse import urlparse
+#from urllib.parse import urlparse
 from functools import partial
 
 from requests.api import get, request
 
-#base folder
+#basefolder
 base_folder = os.path.dirname(__file__)
 
-#database code
+#database
 with sqlite3.connect('pw.db') as db:
     cursor = db.cursor()
 
 #scroll
-
 class ScrollableFrame(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
@@ -53,7 +53,7 @@ username TEXT NOT NULL,
 password TEXT NOT NULL);
 """)
 
-#Create PopUp
+#PopUp
 def popUp():
     popUpWindow = Toplevel(window)
     popUpWindow.grab_set()
@@ -63,11 +63,89 @@ def popUp():
     popUpWindow.resizable(False, False)
     popUpWindow.iconbitmap(icopath)
 
-    def rngPassword():
-        secure_str = ''.join((secrets.choice(string.ascii_letters + string.digits) for i in range(12)))
-        txt3.delete(0,END)
-        txt3.insert(0,secure_str)
+    def genPasswordPopUp():
+        genPassWindow = Toplevel(popUpWindow)
+        genPassWindow.grab_set()
+        genPassWindow.title("Generate Password")
+        genPassWindow.geometry("300x250")
+        genPassWindow.config(bg="#4A4674")
+        genPassWindow.resizable(False, False)
+        genPassWindow.iconbitmap(icopath)
 
+
+        def genPassword():
+            
+            if(settingoption2.instate(['selected']) or settingoption3.instate(['selected'])):
+                if(settingoption1.get().isnumeric()):
+                    length = int(settingoption1.get())
+                else: 
+                    length = 0
+
+                if(settingoption2.instate(['selected']) and settingoption3.instate(['!selected'])):
+                    secure_str = ''.join((secrets.choice(string.ascii_letters) for i in range(length)))
+
+                if(settingoption2.instate(['!selected']) and settingoption3.instate(['selected'])):
+                    secure_str = ''.join((secrets.choice(string.digits) for i in range(length)))
+
+                if(settingoption2.instate(['selected']) and settingoption3.instate(['selected'])):
+                    secure_str = ''.join((secrets.choice(string.ascii_letters + string.digits) for i in range(length)))
+
+                generatedpw.delete(0,END)
+                generatedpw.insert(0,secure_str)
+
+        def usePassword():
+            txt3.delete(0, END)
+            txt3.insert(0, generatedpw.get())
+            
+            genPassWindow.destroy()
+
+        passwordframe = Frame(genPassWindow, bg="#4A4674")
+        passwordframe.pack(fill=X)
+
+        passwordstyle = ttk.Style()
+        passwordstyle.configure('TCheckbutton', background="#4A4674")
+
+        generatedpwlbl = Label(passwordframe, text="Generated Password:", anchor=W, bg="#4A4674", fg="white")
+        generatedpwlbl.pack(expand=YES, fill=X, padx=20, pady=(15,0))
+
+        generatedpw = Entry(passwordframe)
+        generatedpw.pack(expand=YES, fill=BOTH, padx=20, pady=(0,10), ipady=3)
+
+        settingsframe = Frame(genPassWindow, bg="#4A4674")
+        settingsframe.pack(expand=YES, fill=X, padx=20)
+
+        settinglbl1 = Label(settingsframe, text="Length:", bg="#4A4674", fg="white")
+        settinglbl1.grid(row=0, column=0, sticky=W)
+
+        settingoption1 = Entry(settingsframe, width=4)
+        settingoption1.grid(row=0, column=1, sticky=E, padx=(186,0))
+
+        settinglbl2 = Label(settingsframe, text="A-Z", bg="#4A4674", fg="white")
+        settinglbl2.grid(row=1, column=0, sticky=W)
+
+        settingoption2 = ttk.Checkbutton(settingsframe)
+        settingoption2.grid(row=1, column=1, sticky=E)
+        settingoption2.state(['!alternate'])
+        settingoption2.state(['selected'])
+
+        settinglbl3 = Label(settingsframe, text="0-9", bg="#4A4674", fg="white")
+        settinglbl3.grid(row=2, column=0, sticky=W)
+
+        settingoption3 = ttk.Checkbutton(settingsframe)
+        settingoption3.grid(row=2, column=1, sticky=E)
+        settingoption3.state(['!alternate'])
+        settingoption3.state(['selected'])
+
+        buttonframe = Frame(genPassWindow, height=10, bg="#4A4674")
+        buttonframe.pack(fill=X, pady=(0,20))
+
+        genbutton = Button(buttonframe, text="Generate Password", bg="#3C395F", fg="white", height=2, border=0, command=genPassword)
+        genbutton.pack(expand=YES, fill=X, padx=20, pady=10)
+
+        usebutton = Button(buttonframe, text="Confirm", bg="green", fg="white", height=2, border=0, command=usePassword)
+        usebutton.pack(expand=YES, fill=X, padx=20)
+
+        
     def addEntry():
         website = txt.get()
         username = txt2.get()
@@ -103,7 +181,7 @@ def popUp():
     txt3 = Entry(popUpWindow, font=30)
     txt3.pack(ipadx=143,ipady=5,pady=(0,10))
 
-    btn3 = Button(txt3, command=rngPassword, text="RNG")
+    btn3 = Button(txt3, command=genPasswordPopUp, text="RNG")
     btn3.pack(anchor=E, expand=YES)
 
     btn = Button(popUpWindow, command=addEntry, text="Add password", width=45, height=2, bg="green", fg="white", border=0)
@@ -117,7 +195,7 @@ window.title("Password Manager")
 window.config(bg="#4A4674")
 window.resizable(False, False)
 
-icopath = os.path.join(base_folder, "icon.ico")
+icopath = os.path.join(base_folder, "logo.ico")
 
 window.iconbitmap(icopath)
 
@@ -128,10 +206,9 @@ def hashPassword(input):
 
     return hash1
 
-
 def firstTimeScreen():
     window.geometry('600x400')
-    
+
     header = Canvas(window, width=600, height=70, bg="#3C395F", highlightthickness=0)
     header.pack(fill=BOTH, expand=NO, pady=(0, 60))
 
@@ -292,7 +369,7 @@ def vaultScreen():
     headertext = Label(headerframe, text="Password Manager", fg="white", bg="#3C395F", font=60)
     headertext.grid(pady=20, padx=10, row=0, column=0)
 
-    headerbtn = Button(headerframe, text="ADD", fg="white", bg="green", border=0, command=popUp)
+    headerbtn = Button(headerframe, text="ADD ACCOUNT", fg="white", bg="green", border=0, command=popUp)
     headerbtn.grid(pady=20, padx=(0,25), ipadx=5, ipady=5, row=0, column=3, sticky=E)
 
     lbl = Label(headerframe, text="Website", relief=RAISED, width=28, anchor=W, bg="#3C395F", fg="white")
@@ -325,15 +402,15 @@ def vaultScreen():
             lbl3.grid(column=2, row=(i+3))
 
             btnframe = Frame(contentframe.scrollable_frame)
-            btnframe.grid(column=3, row=(i+3), padx=50)
+            btnframe.grid(column=3, row=(i+3), padx=20)
 
-            btn = Button(btnframe, text="C", command = partial(pyperclip.copy, array[i][3]), bg="blue", fg="white", border=0, width=2, pady=2) 
+            btn = Button(btnframe, text="COPY", command = partial(pyperclip.copy, array[i][3]), bg="#4A4674", fg="white", border=0, width=5, pady=2) 
             btn.grid(column=0, row=0, pady=10, padx=5)
 
-            btn1 = Button(btnframe, text="E", command = partial(editPopUp, array[i][0]), bg="yellow", fg="white", border=0, width=2, pady=2)
+            btn1 = Button(btnframe, text="EDIT", command = partial(editPopUp, array[i][0]), bg="#3C395F", fg="white", border=0, width=5, pady=2)
             btn1.grid(column=1, row=0, pady=10, padx=5)
 
-            btn2 = Button(btnframe, text="D", command = partial(removeEntry, array[i][0]), bg="red", fg="white", border=0, width=2, pady=2)
+            btn2 = Button(btnframe, text="DEL", command = partial(removeEntry, array[i][0]), bg="red", fg="white", border=0, width=5, pady=2)
             btn2.grid(column=2, row=0, pady=10, padx=5)
 
             i = i + 1
