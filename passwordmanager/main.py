@@ -72,7 +72,6 @@ def popUp():
         genPassWindow.resizable(False, False)
         genPassWindow.iconbitmap(icopath)
 
-
         def genPassword():
             
             if(settingoption2.instate(['selected']) or settingoption3.instate(['selected'])):
@@ -119,6 +118,7 @@ def popUp():
 
         settingoption1 = Entry(settingsframe, width=4)
         settingoption1.grid(row=0, column=1, sticky=E, padx=(186,0))
+        settingoption1.insert(0, "12")
 
         settinglbl2 = Label(settingsframe, text="A-Z", bg="#4A4674", fg="white")
         settinglbl2.grid(row=1, column=0, sticky=W)
@@ -179,10 +179,10 @@ def popUp():
     lbl3.pack()
 
     txt3 = Entry(popUpWindow, font=30)
-    txt3.pack(ipadx=143,ipady=5,pady=(0,10))
+    txt3.pack(ipadx=140,ipady=7,pady=(0,10))
 
-    btn3 = Button(txt3, command=genPasswordPopUp, text="RNG")
-    btn3.pack(anchor=E, expand=YES)
+    btn3 = Button(txt3, width=5, command=genPasswordPopUp, text="+", border=0, bg="#3C395F", fg="white")
+    btn3.pack(anchor=E, expand=YES, fill=Y)
 
     btn = Button(popUpWindow, command=addEntry, text="Add password", width=45, height=2, bg="green", fg="white", border=0)
     btn.pack(ipadx=1, pady=(20,0))
@@ -289,7 +289,6 @@ def loginScreen():
 
     btn = Button(window, text="Submit", command=checkPassword, width=44, height=2, bg="green", fg="white", border=0)
     btn.pack(pady=5)
-
 
 def vaultScreen():
     for widget in window.winfo_children():
