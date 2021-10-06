@@ -1,4 +1,4 @@
-import secrets, string, sqlite3, hashlib, os, pyperclip
+import secrets, string, sqlite3, hashlib, sys, os, pyperclip
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -6,7 +6,10 @@ from tkinter import *
 from functools import partial
 
 #basefolder
-base_folder = os.path.dirname(__file__)
+if getattr(sys, 'frozen', False):
+    base_folder = os.path.dirname(sys.executable)
+elif __file__:
+    base_folder = os.path.dirname(__file__)
 
 #database
 dir_path = os.path.join(os.environ['APPDATA'], 'timdb')
@@ -197,7 +200,7 @@ window.title("Password Manager")
 window.config(bg="#4A4674")
 window.resizable(False, False)
 
-icopath = "C:/Users/timde/Documents/Python/CH_PasswordManager/logo.ico"
+icopath = os.path.join(base_folder, "logo.ico")
 
 window.iconbitmap(icopath)
 
