@@ -2,9 +2,8 @@ import secrets, string, sqlite3, hashlib, os, pyperclip
 from tkinter import font
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 from tkinter import *
-#from PIL import ImageTk, Image
-#from urllib.parse import urlparse
 from functools import partial
 
 from requests.api import get, request
@@ -295,9 +294,12 @@ def vaultScreen():
         widget.destroy()
 
     def removeEntry(input):
-        cursor.execute("DELETE FROM vault WHERE id = ?", (input,))
-        db.commit()
-        vaultScreen()
+        warningPopUp = messagebox.askyesno("Are you sure?", "Delete this entry?")
+
+        if warningPopUp == TRUE:   
+            cursor.execute("DELETE FROM vault WHERE id = ?", (input,))
+            db.commit()
+            vaultScreen()
 
     def editPopUp(input):
         id = input
