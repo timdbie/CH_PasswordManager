@@ -1,11 +1,11 @@
-# CH_PasswordManager
+# Python Password Manager
 
-My first project of the year is a Password Manager made in Python. This is my first big project in Python.
+For my first project of the year I have made a Password Manager in Python using Tkinter Framework. This project was made in 3 weeks.
 
-**THIS IS ONLY A PROJECT AND NOT MEANT TO BE USED**
-
-This program requires the following libraries:
-
+Libraries Used:
+- Tkinter
 - SQLite3
-- pyperclip
+- Hashlib
+- Pyperclip
 
+**THIS APPLICATION IS NOT MEANT FOR DAILY USE, PLEASE USE A KNOWN PASSWORD MANAGER INSTEAD**
